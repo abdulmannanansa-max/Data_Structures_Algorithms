@@ -1,42 +1,39 @@
-import java.util.HashSet;
-
 public class Leetcode_76 {
 
     public static String minWindow(String s, String t) {
-        if (s.length() < t.length()) {
+        if (s.length() == 0 || t.length() == 0) {
             return "";
         }
 
-        HashSet<Character> set = new HashSet<>();
+        int[] tFreq = new int[128];
         for (char c : t.toCharArray()) {
-            set.add(c);
+            tFreq[c]++;
         }
 
-        int left = 0, right = 0;
-        int minLength = Integer.MAX_VALUE;
-        int start = 0;
-
+        int left = 0, right = 0, minLeft = 0, minLen = Integer.MAX_VALUE, count = 0;
         while (right < s.length()) {
-            char c = s.charAt(right);
-            if (set.contains(c)) {
-                set.remove(c);
+            char cRight = s.charAt(right);
+            if (tFreq[cRight] > 0) {
+                count++;
             }
+            tFreq[cRight]--;
             right++;
 
-            while (set.isEmpty()) {
-                if (right - left < minLength) {
-                    minLength = right - left;
-                    start = left;
+            while (count == t.length()) {
+                if (right - left < minLen) {
+                    minLen = right - left;
+                    minLeft = left;
                 }
-                char leftChar = s.charAt(left);
-                if (t.indexOf(leftChar) != -1) {
-                    set.add(leftChar);
+                char cLeft = s.charAt(left);
+                tFreq[cLeft]++;
+                if (tFreq[cLeft] > 0) {
+                    count--;
                 }
                 left++;
             }
         }
 
-        return minLength == Integer.MAX_VALUE ? "" : s.substring(start, start + minLength);
+        return minLen == Integer.MAX_VALUE ? "" : s.substring(minLeft, minLeft + minLen);
     }
 
     public static void main(String[] args) {
